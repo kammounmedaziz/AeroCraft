@@ -1,5 +1,5 @@
-import  { useState, useEffect, useRef } from 'react';
-import { Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Sparkles, BarChart3, Users } from 'lucide-react';
 
 const AnimatedBackground = () => {
   const blobRefs = useRef([])
@@ -77,8 +77,22 @@ const Home = () => {
     };
   }, []);
 
+  // Navigation functions
+  const handleGetStarted = () => {
+    // For React Router, you would use: navigate('/statistics')
+    // For now, using window.location for demonstration
+    window.location.href = '#Statistics';
+  };
+
+  const handleTeamClick = () => {
+    // For React Router, you would use: navigate('/team')
+    // For now, using window.location for demonstration
+    window.location.href = '#Team';
+  };
+
   return (
     <div id="Home" className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      <AnimatedBackground />
 
       {/* Main content container */}
       <div className="text-center z-10 relative max-w-5xl mx-auto px-[5%]">
@@ -112,9 +126,11 @@ const Home = () => {
           <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-[#f1636f]" />
         </p>
 
-        {/* Call-to-action button matching About page style */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-4">
+        {/* Call-to-action buttons */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-6">
+          {/* Get Started Button */}
           <button 
+            onClick={handleGetStarted}
             className={`
               w-full lg:w-auto px-8 py-4 md:px-12 md:py-5 text-lg md:text-xl font-semibold text-white
               bg-gradient-to-r from-[#f1636f] to-[#a855f7] hover:from-[#e55a66] hover:to-[#9333ea]
@@ -131,11 +147,32 @@ const Home = () => {
             
             {/* Button content */}
             <span className="relative z-10 flex items-center justify-center gap-2">
+              <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
               Get Started
             </span>
             
             {/* Hover shine effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+          </button>
+
+          {/* Team Button */}
+          <button 
+            onClick={handleTeamClick}
+            type="button"
+            className={`
+              w-full lg:w-auto px-8 py-4 md:px-12 md:py-5 text-lg md:text-xl font-medium 
+              rounded-lg border-2 border-gray-200 bg-transparent text-white shadow-sm 
+              hover:bg-white/10 focus:outline-none focus:bg-white/10 
+              disabled:opacity-50 disabled:pointer-events-none
+              transition-all duration-300 hover:scale-105
+              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+            `}
+            style={{ 
+              transitionDelay: '700ms'
+            }}
+          >
+            <Users className="w-5 h-5 md:w-6 md:h-6 inline mr-2" />
+            Our Team
           </button>
         </div>
 
