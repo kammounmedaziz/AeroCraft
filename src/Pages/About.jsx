@@ -12,7 +12,7 @@ const Header = memo(() => (
         data-aos="zoom-in-up"
         data-aos-duration="600"
       >
-        About Me
+        About
       </h2>
     </div>
     <p 
