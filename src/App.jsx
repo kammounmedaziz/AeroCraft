@@ -8,6 +8,7 @@ import Home from "./Pages/Home";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import About from "./Pages/About";
+import NotFound from "./Pages/404Page";
 
 
 
@@ -24,8 +25,7 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
         <>
           <Navbar />
           <AnimatedBackground />
-          <Home />
-          <About />
+          <NotFound/>
 
           
           </>
