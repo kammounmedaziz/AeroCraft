@@ -7,8 +7,9 @@ import AnimatedBackground from "./Components/Background";
 import Home from "./Pages/Home";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
-import About from "./Pages/About";
-import NotFound from "./Pages/404Page";
+// import About from "./Pages/About";
+// import NotFound from "./Pages/404Page";
+import Footer from "./Components/Footer";
 
 
 
@@ -25,7 +26,8 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
         <>
           <Navbar />
           <AnimatedBackground />
-          <NotFound/>
+          <Home />
+          <Footer/>
 
           
           </>
