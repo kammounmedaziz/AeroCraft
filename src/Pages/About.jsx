@@ -1,5 +1,5 @@
-import  { useEffect, memo, useMemo } from "react"
-import { FileText, Code, Award, Globe, ArrowUpRight, Sparkles, UserCheck } from "lucide-react"
+import  { useEffect, memo } from "react"
+import { FileText, Sparkles } from "lucide-react"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
@@ -26,7 +26,7 @@ const Header = memo(() => (
     </p>
   </div>
 ));
-
+Header.displayName = "Header";
 const ProfileImage = memo(() => (
   <div className="flex justify-end items-center sm:p-12 sm:py-0 sm:pb-0 p-0 py-2 pb-2">
     <div 
@@ -67,50 +67,8 @@ const ProfileImage = memo(() => (
     </div>
   </div>
 ));
+ProfileImage.displayName = "ProfileImage";
 
-const StatCard = memo(({ icon: Icon, color, value, label, description, animation }) => (
-  <div data-aos={animation} data-aos-duration={1300} className="relative group">
-    <div className="relative z-10 bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-white/10 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col justify-between">
-      <div className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
-      
-      <div className="flex items-center justify-between mb-4">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white/10 transition-transform group-hover:rotate-6">
-          <Icon className="w-8 h-8 text-white" />
-        </div>
-        <span 
-          className="text-4xl font-bold text-white"
-          data-aos="fade-up-left"
-          data-aos-duration="1500"
-          data-aos-anchor-placement="top-bottom"
-        >
-          {value}
-        </span>
-      </div>
-
-      <div>
-        <p 
-          className="text-sm uppercase tracking-wider text-gray-300 mb-2"
-          data-aos="fade-up"
-          data-aos-duration="800"
-          data-aos-anchor-placement="top-bottom"
-        >
-          {label}
-        </p>
-        <div className="flex items-center justify-between">
-          <p 
-            className="text-xs text-gray-400"
-            data-aos="fade-up"
-            data-aos-duration="1000"
-            data-aos-anchor-placement="top-bottom"
-          >
-            {description}
-          </p>
-          <ArrowUpRight className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
-        </div>
-      </div>
-    </div>
-  </div>
-));
 
 const AboutPage = () => {
 
@@ -171,7 +129,7 @@ const AboutPage = () => {
               data-aos-duration="1500"
             >
               Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+              Lorem Ipsum has been the industry&#39;s standard dummy text ever since the 1500s, 
               when an unknown printer took a galley of type and scrambled it to make a type 
               specimen book. It has survived not only five centuries, but also the leap into 
               electronic typesetting, remaining essentially unchanged. It was popularised in 
@@ -199,7 +157,7 @@ const AboutPage = () => {
 
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-20px); }
