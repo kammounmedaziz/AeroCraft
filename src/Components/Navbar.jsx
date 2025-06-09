@@ -1,10 +1,12 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState("Home");
+    const location = useLocation();
     
     const navItems = [
         { href: "#Home", label: "Home" },
@@ -56,12 +58,28 @@ const Navbar = () => {
 
     const scrollToSection = (e, href) => {
         e.preventDefault();
-        const section = document.querySelector(href);
-        if (section) {
+        
+        // Handle home navigation specially
+        if (href === "#Home") {
+            // If we're not on the home page, navigate there first
+            if (location.pathname !== '/') {
+                window.location.href = '/';
+                return;
+            }
+            // If we're already on home page, scroll to top
             window.scrollTo({
-                top: section.offsetTop - 80, // Adjusted offset for better positioning
+                top: 0,
                 behavior: "smooth"
             });
+        } else {
+            // Handle other sections
+            const section = document.querySelector(href);
+            if (section) {
+                window.scrollTo({
+                    top: section.offsetTop - 80, // Adjusted offset for better positioning
+                    behavior: "smooth"
+                });
+            }
         }
         setIsOpen(false);
     };
