@@ -1,3 +1,5 @@
+import React from 'react';
+
 import  { useEffect, useRef, useCallback, useMemo } from "react";
 
 const DEFAULT_BEHIND_GRADIENT =

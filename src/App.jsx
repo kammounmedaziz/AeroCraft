@@ -1,16 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import  { useState } from 'react';
 import "./index.css";
-// import Navbar from "./Components/Navbar";
+ import Navbar from "./Components/Navbar";
 import WelcomeScreen from "./Pages/WelcomeScreen";
 import AnimatedBackground from "./Components/Background";
-// import Home from "./Pages/Home";
+ import Home from "./Pages/Home";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
-// import About from "./Pages/About";
-// import NotFound from "./Pages/404Page";
-// import Footer from "./Components/Footer";
-import ProfileCard from "./Components/ProfileCard";
+ import About from "./Pages/About";
+ //import NotFound from "./Pages/404Page";
+ import Footer from "./Components/Footer";
+
+import Team from "./Pages/Team";
 
 
 
@@ -28,8 +29,11 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
         <>
 
           <AnimatedBackground />
-          <ProfileCard/>
-          
+          <Navbar/>
+          <Home/>
+          <About/>
+          <Team/>
+          <Footer/>
 
           
           </>
