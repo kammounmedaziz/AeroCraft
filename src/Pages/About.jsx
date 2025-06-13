@@ -154,6 +154,17 @@ const AboutPage = () => {
 
           <ProfileImage />
         </div>
+        <div 
+          className="mt-16"
+          data-aos="fade-up"
+          data-aos-duration="1200"
+        >
+          <div className="flex items-center justify-center gap-8 text-gray-500">
+            <div className="w-12 h-px bg-gradient-to-r from-transparent to-[#f1636f]"></div>
+            <div className="w-2 h-2 bg-[#f1636f] rounded-full animate-pulse"></div>
+            <div className="w-12 h-px bg-gradient-to-l from-transparent to-[#a855f7]"></div>
+          </div>
+        </div>
 
       </div>
 
