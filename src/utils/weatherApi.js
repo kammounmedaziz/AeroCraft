@@ -1,4 +1,4 @@
-const API_KEY = "32a5bb7b9aa1126387e06acad817149e";
+const API_KEY = "b1fd6e14799699504191b6bdbcadfc35";
 const API_URL_CURRENT = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric`;
 const API_URL_3HOURS = `https://api.openweathermap.org/data/2.5/forecast?appid=${API_KEY}&units=metric`;
 // It calls the API from openweathermap

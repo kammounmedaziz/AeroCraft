@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from 'react';
 import "./index.css";
@@ -8,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import Footer from "./Components/Footer";
 import Dashboard from "./Pages/Dashboard";
+import WeatherPage from './Pages/destination weather/WeatherPage';
 
 
 

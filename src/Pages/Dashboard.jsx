@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import WeatherPage from "../Pages/destination weather/WeatherPage";
+import { useState, useEffect, useRef } from 'react';
 import { 
   Home, 
   BarChart3, 
@@ -14,7 +13,164 @@ import {
   Cloud
 } from 'lucide-react';
 
-// Animated Background Component (from your Home page)
+// WeatherPage component - self-contained for the dashboard
+const WeatherPage = () => {
+  const [state, setState] = useState({
+    firstTime: true,
+    city: "",
+    weekday: "",
+    temp: "",
+    weatherDescription: "",
+    weatherIcon: "",
+    country: "",
+    timezone: "",
+    time: "",
+    forecast3hrs: [],
+    forecastWeekly: [],
+    loading: false,
+    error: null
+  });
+
+  // Simple weather API call using fetch
+  const fetchWeatherData = async (city) => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      // Using OpenWeatherMap API (you'll need to replace YOUR_API_KEY with an actual key)
+      const API_KEY = 'demo_key'; // Replace with your actual API key
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Weather data not found');
+      }
+      
+      const data = await response.json();
+      
+      setState(prev => ({
+        ...prev,
+        firstTime: false,
+        city: data.name,
+        country: data.sys.country,
+        temp: Math.round(data.main.temp),
+        weatherDescription: data.weather[0].description,
+        weatherIcon: data.weather[0].icon,
+        loading: false
+      }));
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: error.message,
+        firstTime: false
+      }));
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const city = formData.get('city');
+    if (city.trim()) {
+      fetchWeatherData(city.trim());
+    }
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+          Weather Forecast
+        </h1>
+        <p className="text-gray-400">Get current weather information for any city</p>
+      </div>
+
+      {/* Search Form */}
+      <form onSubmit={handleSearch} className="mb-8">
+        <div className="flex gap-4">
+          <input
+            type="text"
+            name="city"
+            placeholder="Enter city name..."
+            className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm"
+          />
+          <button
+            type="submit"
+            disabled={state.loading}
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {state.loading ? 'Searching...' : 'Search'}
+          </button>
+        </div>
+      </form>
+
+      {/* Weather Display */}
+      {state.error && (
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg backdrop-blur-sm">
+          <p className="text-red-400">⚠️ {state.error}</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Note: This demo uses a placeholder API key. Replace with your OpenWeatherMap API key for full functionality.
+          </p>
+        </div>
+      )}
+
+      {!state.firstTime && !state.error && state.city && (
+        <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Current Weather */}
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {state.city}, {state.country}
+                </h2>
+                <p className="text-gray-400 capitalize">{state.weatherDescription}</p>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {state.weatherIcon && (
+                  <img
+                    src={`https://openweathermap.org/img/wn/${state.weatherIcon}@2x.png`}
+                    alt={state.weatherDescription}
+                    className="w-16 h-16"
+                  />
+                )}
+                <div>
+                  <span className="text-4xl font-bold text-white">{state.temp}°C</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-white">Weather Details</h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="p-3 bg-gray-800/50 rounded-lg">
+                  <p className="text-gray-400">Temperature</p>
+                  <p className="text-white font-semibold">{state.temp}°C</p>
+                </div>
+                <div className="p-3 bg-gray-800/50 rounded-lg">
+                  <p className="text-gray-400">Condition</p>
+                  <p className="text-white font-semibold capitalize">{state.weatherDescription}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {state.firstTime && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🌤️</div>
+          <h3 className="text-xl font-semibold text-white mb-2">Search for Weather</h3>
+          <p className="text-gray-400">Enter a city name to get current weather information</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Animated Background Component
 const AnimatedBackground = () => {
   const blobRefs = useRef([])
   const initialPositions = [
@@ -41,8 +197,10 @@ const AnimatedBackground = () => {
         const y = initialPos.y + yOffset
 
         // Apply transformation with smooth transition
-        blob.style.transform = `translate(${x}px, ${y}px)`
-        blob.style.transition = "transform 1.4s ease-out"
+        if (blob) {
+          blob.style.transform = `translate(${x}px, ${y}px)`
+          blob.style.transition = "transform 1.4s ease-out"
+        }
       })
 
       requestId = requestAnimationFrame(handleScroll)
@@ -51,7 +209,7 @@ const AnimatedBackground = () => {
     window.addEventListener("scroll", handleScroll)
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      cancelAnimationFrame(requestId)
+      if (requestId) cancelAnimationFrame(requestId)
     }
   }, [])
 
@@ -208,6 +366,7 @@ const Dashboard = () => {
             </div>
           </div>
           
+          {/* Navigation Menu - Fixed to be inside sidebar */}
           <nav className="mt-4">
             {menuItems.map((item) => {
               const Icon = item.icon;
@@ -233,8 +392,8 @@ const Dashboard = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="p-8 relative z-10">
-            <div className="backdrop-blur-md bg-black/10 rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-4rem)] p-8">
+          <div className="p-4 md:p-8 relative z-10">
+            <div className="backdrop-blur-lg bg-gray-900/30 rounded-2xl border border-gray-700 shadow-xl min-h-[calc(100vh-4rem)] p-4 md:p-8">
               {renderPage()}
             </div>
           </div>

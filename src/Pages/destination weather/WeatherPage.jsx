@@ -3,6 +3,7 @@ import "./WeatherPage.css";
 import weatherApi from "../../utils/weatherApi";
 import SearchBar from "../../Components/SearchBar/SearchBar";
 import TodayData from "../../Components/TodayData/TodayData";
+import { Card } from "../../Components/ui/Card";
 
 const WeatherPage = () => {
   const [state, setState] = useState({
@@ -75,28 +76,31 @@ const WeatherPage = () => {
   };
 
   return (
-    <div className="main">
-      <div className="navbar-main">
-        <h1>Weather</h1>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          Weather Forecast
+        </h1>
       </div>
       <SearchBar onSearch={search} />
       {displayResult() ? (
-        <TodayData
-          city={state.city}
-          country={state.country}
-          temp={state.temp}
-          time={state.time}
-          weekday={state.weekday}
-          weatherDescription={state.weatherDescription}
-          weatherIcon={state.weatherIcon}
-          forecast3hrs={state.forecast3hrs}
-          forecastWeekly={state.forecastWeekly}
-        />
+        <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700">
+          <TodayData
+            city={state.city}
+            country={state.country}
+            temp={state.temp}
+            time={state.time}
+            weekday={state.weekday}
+            weatherDescription={state.weatherDescription}
+            weatherIcon={state.weatherIcon}
+            forecast3hrs={state.forecast3hrs}
+            forecastWeekly={state.forecastWeekly}
+          />
+        </div>
       ) : (
         warningBanner()
       )}
     </div>
   );
 };
-
 export default WeatherPage;

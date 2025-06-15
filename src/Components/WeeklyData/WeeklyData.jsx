@@ -14,38 +14,24 @@ class WeeklyData extends React.Component {
     return weatherApi.getWeeklyData(forecastWeekly);
   }
 
-  render() {
+   render() {
     const weeklyData = this.getWeeklyData(this.props.forecastWeekly);
     return (
-      <div className="row rowWeeklyData">
-        <div className="table-responsive">
-          <table className="table table-borderless">
-            <tbody>
-              <tr>
-                {weeklyData.map(forecast => {
-                  return <td key={forecast.weekday}>{forecast.weekday}</td>;
-                })}
-              </tr>
-              <tr>
-                {weeklyData.map(forecast => {
-                  return (
-                    <td key={forecast.weekday} className="weeklyData">
-                      <img src={forecast.weather_icon} alt="" />
-                    </td>
-                  );
-                })}
-              </tr>
-              <tr>
-                {weeklyData.map(forecast => {
-                  return (
-                    <td key={forecast.weekday} className="weeklyData">
-                      {forecast.max}° | {forecast.min}°
-                    </td>
-                  );
-                })}
-              </tr>
-            </tbody>
-          </table>
+      <div className="overflow-x-auto">
+        <div className="flex space-x-6 min-w-max">
+          {weeklyData.map(forecast => (
+            <div key={forecast.weekday} className="flex flex-col items-center">
+              <p className="text-gray-300">{forecast.weekday}</p>
+              <img 
+                src={forecast.weather_icon} 
+                alt="" 
+                className="w-12 h-12 my-2"
+              />
+              <p className="text-white">
+                {forecast.max}° | {forecast.min}°
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     );

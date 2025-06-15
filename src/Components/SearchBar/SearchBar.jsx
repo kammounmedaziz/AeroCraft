@@ -23,32 +23,27 @@ class SearchBar extends React.Component {
   }
 
   render() {
-  return (
-    <div className="container w-75">
-      <div className="input-group searchBar">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="City..."
-          aria-label="City..."
-          aria-describedby="button-addon2"
-          onChange={this.handleTermChange}
-        />
-        <div className="input-group-append">
+    return (
+      <div className="w-full max-w-2xl mb-8">
+        <div className="flex">
+          <input
+            type="text"
+            className="flex-1 px-4 py-3 rounded-l-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            placeholder="Search city..."
+            onChange={this.handleTermChange}
+          />
           <button
-            className="btn btn-outline-success"
-            type="button"
-            id="button-addon2"
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-r-lg hover:opacity-90 transition-opacity"
             onClick={this.search}
           >
             Search
           </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
-}
+
 
 export default SearchBar;
