@@ -1,18 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import  { useState } from 'react';
+import { useState } from 'react';
 import "./index.css";
- import Navbar from "./Components/Navbar";
+import Navbar from "./Components/Navbar";
 import WelcomeScreen from "./Pages/WelcomeScreen";
 import AnimatedBackground from "./Components/Background";
- import Home from "./Pages/Home";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
- import About from "./Pages/About";
- //import NotFound from "./Pages/404Page";
- import Footer from "./Components/Footer";
-
-import Team from "./Pages/Team";
-
+import Footer from "./Components/Footer";
+import Dashboard from "./Pages/Dashboard";
 
 
 
@@ -26,17 +21,18 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
       </AnimatePresence>
 
       {!showWelcome && (
-        <>
-
-          <AnimatedBackground />
-          <Navbar/>
-          <Home/>
-          <About/>
-          <Team/>
-          <Footer/>
-
+        <div className="relative">
+          {/* Background with lower z-index */}
+          <div className="absolute inset-0 z-0">
+            <AnimatedBackground />
+          </div>
           
-          </>
+          {/* Content with higher z-index */}
+          <div className="relative z-10">
+            <Dashboard />
+            <Footer />
+          </div>
+        </div>
       )}
     </>
   );

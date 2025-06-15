@@ -1,6 +1,6 @@
 import React from "react";
 import "./WeeklyData.css";
-import weatherApi from "../../util/weatherApi";
+import weatherApi from "../../utils/weatherApi";
 
 // Get the weekly data, it creates a timeline per:
 //    - week day, icon, max and min temp

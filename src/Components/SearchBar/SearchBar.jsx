@@ -23,30 +23,32 @@ class SearchBar extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <div className="container w-75 searchBar">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="City..."
-            aria-label="City..."
-            aria-describedby="button-addon2"
-            onChange={this.handleTermChange}
-          />
-          <div className="input-group-append">
-            <button
-              className="btn btn-outline-success"
-              type="button"
-              onClick={this.search}
-            >
-              Search
-            </button>
-          </div>
+  return (
+    <div className="container w-75">
+      <div className="input-group searchBar">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="City..."
+          aria-label="City..."
+          aria-describedby="button-addon2"
+          onChange={this.handleTermChange}
+        />
+        <div className="input-group-append">
+          <button
+            className="btn btn-outline-success"
+            type="button"
+            id="button-addon2"
+            onClick={this.search}
+          >
+            Search
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 }
 
 export default SearchBar;
