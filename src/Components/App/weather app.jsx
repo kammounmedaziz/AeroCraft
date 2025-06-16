@@ -65,10 +65,10 @@ class App extends Component {
 
   render() {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white px-4 py-6">
+      <div className="min-h-screen  text-white px-4 py-6">
         <div className="max-w-5xl mx-auto">
           <header className="mb-8 text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-red-500 text-transparent bg-clip-text">
               Weather App
             </h1>
           </header>

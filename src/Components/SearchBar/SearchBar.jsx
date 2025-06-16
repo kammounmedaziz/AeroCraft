@@ -1,7 +1,5 @@
 import React from "react";
-import "./SearchBar.css";
 
-// So far it's possible to search only thgough city name
 class SearchBar extends React.Component {
   constructor(props) {
     super(props);
@@ -12,10 +10,9 @@ class SearchBar extends React.Component {
     this.handleTermChange = this.handleTermChange.bind(this);
   }
 
-  // This search method actually runs a search method from
-  // the APP component. That's why: this.PROPS....
-  search() {
+  search(event) {
     this.props.onSearch(this.state.term);
+    event.preventDefault();
   }
 
   handleTermChange(event) {
@@ -24,26 +21,28 @@ class SearchBar extends React.Component {
 
   render() {
     return (
-      <div className="w-full max-w-2xl mb-8">
-        <div className="flex">
+      <div className="flex justify-center my-6">
+        <form
+          onSubmit={this.search}
+          className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-md"
+        >
           <input
             type="text"
-            className="flex-1 px-4 py-3 rounded-l-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            placeholder="Search city..."
+            placeholder="Search a city..."
+            className="px-4 py-2 rounded-xl text-white bg-slate-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 w-64"
+            value={this.state.term}
             onChange={this.handleTermChange}
           />
           <button
-            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-r-lg hover:opacity-90 transition-opacity"
-            onClick={this.search}
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition-shadow duration-300 shadow-md hover:shadow-blue-500/50"
           >
             Search
           </button>
-        </div>
+        </form>
       </div>
     );
   }
 }
-
-
 
 export default SearchBar;

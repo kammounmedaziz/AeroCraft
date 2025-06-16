@@ -1,5 +1,5 @@
 import AirportPage from './AirportPage';
-import WeatherPage from '../Pages/destination weather/WeatherPage';
+import WeatherApp from '../Components/App/weather app';
 import { useState, useEffect, useRef } from 'react';
 import { 
   Home, 
@@ -130,7 +130,7 @@ const Dashboard = () => {
         );
       case 'weather':
         return (
-          <WeatherPage />
+          <WeatherApp />
         );
       case 'AirportPage':
         return (

@@ -1,9 +1,6 @@
 import React from "react";
-import "./WeeklyData.css";
 import weatherApi from "../../utils/weatherApi";
 
-// Get the weekly data, it creates a timeline per:
-//    - week day, icon, max and min temp
 class WeeklyData extends React.Component {
   constructor(props) {
     super(props);
@@ -14,21 +11,27 @@ class WeeklyData extends React.Component {
     return weatherApi.getWeeklyData(forecastWeekly);
   }
 
-   render() {
+  render() {
     const weeklyData = this.getWeeklyData(this.props.forecastWeekly);
     return (
-      <div className="overflow-x-auto">
-        <div className="flex space-x-6 min-w-max">
+      <div className="overflow-x-auto py-4">
+        <div className="flex space-x-8 min-w-max justify-center">
           {weeklyData.map(forecast => (
-            <div key={forecast.weekday} className="flex flex-col items-center">
-              <p className="text-gray-300">{forecast.weekday}</p>
+            <div 
+              key={forecast.weekday} 
+              className="flex flex-col items-center bg-gradient-to-b from-indigo-700 via-indigo-900 to-black rounded-lg p-4 shadow-md min-w-[80px]"
+            >
+              <p className="text-sm text-indigo-300 font-semibold mb-1">
+                {forecast.weekday}
+              </p>
               <img 
                 src={forecast.weather_icon} 
-                alt="" 
-                className="w-12 h-12 my-2"
+                alt={`${forecast.weekday} weather icon`} 
+                className="w-12 h-12 mb-2"
               />
-              <p className="text-white">
-                {forecast.max}° | {forecast.min}°
+              <p className="text-white font-medium text-base">
+                <span className="text-red-400">{forecast.max}°</span> |{" "}
+                <span className="text-blue-400">{forecast.min}°</span>
               </p>
             </div>
           ))}
