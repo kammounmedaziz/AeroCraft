@@ -1,3 +1,4 @@
+import weatherApi from "../../utils/weatherApi";
 import React, { useState } from 'react';
 import { 
   Droplets,
@@ -23,88 +24,6 @@ const Card = ({ className, children, ...props }) => {
       {children}
     </div>
   );
-};
-
-// Weather API implementation
-const weatherApi = {
-  API_KEY: 'demo', // In a real app, you'd use a real API key
-  BASE_URL: 'https://api.openweathermap.org/data/2.5',
-
-  // Mock data for demonstration
-  getCurrentWeather: async (city) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock current weather data
-    const mockData = {
-      name: city,
-      sys: { country: 'XX' },
-      main: {
-        temp: Math.round(Math.random() * 30 + 5), // 5-35°C
-        feels_like: Math.round(Math.random() * 30 + 5),
-        humidity: Math.round(Math.random() * 60 + 30) // 30-90%
-      },
-      wind: {
-        speed: Math.round(Math.random() * 20 + 5) // 5-25 km/h
-      },
-      visibility: Math.round(Math.random() * 8000 + 2000), // 2-10km in meters
-      weather: [{
-        description: ['clear sky', 'partly cloudy', 'cloudy', 'light rain', 'sunny'][Math.floor(Math.random() * 5)],
-        icon: '01d'
-      }]
-    };
-    
-    return mockData;
-  },
-
-  getHourlyForecast: async (city) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Generate 8 data points for next 24 hours (every 3 hours)
-    const hourlyData = [];
-    for (let i = 0; i < 8; i++) {
-      const baseTemp = Math.round(Math.random() * 25 + 10);
-      hourlyData.push({
-        time: `${(i * 3).toString().padStart(2, '0')}:00`,
-        temp: baseTemp + Math.round(Math.random() * 6 - 3), // ±3°C variation
-        main: { temp: baseTemp }
-      });
-    }
-    
-    return hourlyData;
-  },
-
-  getWeeklyForecast: async (city) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const conditions = ['Clear', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Sunny'];
-    const icons = ['☀️', '⛅', '☁️', '🌦️', '🌤️'];
-    
-    const weeklyData = [];
-    for (let i = 0; i < 7; i++) {
-      const conditionIndex = Math.floor(Math.random() * conditions.length);
-      const highTemp = Math.round(Math.random() * 20 + 15); // 15-35°C
-      const lowTemp = highTemp - Math.round(Math.random() * 8 + 3); // 3-10°C lower
-      
-      weeklyData.push({
-        weekday: weekdays[i],
-        day: weekdays[i],
-        date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toLocaleDateString(),
-        condition: conditions[conditionIndex],
-        description: conditions[conditionIndex].toLowerCase(),
-        icon: icons[conditionIndex],
-        max: highTemp,
-        min: lowTemp,
-        highTemp: highTemp,
-        lowTemp: lowTemp,
-        humidity: Math.round(Math.random() * 40 + 40), // 40-80%
-        windSpeed: Math.round(Math.random() * 15 + 5) // 5-20 km/h
-      });
-    }
-    
-    return weeklyData;
-  }
 };
 
 // GetGraph component
@@ -306,6 +225,9 @@ const WeatherPage = () => {
 
   const [searchInput, setSearchInput] = useState('');
 
+  // You'll need to import your weatherApi utility here
+  // import weatherApi from "../../utils/weatherApi";
+
   // Real weather API call function
   const fetchWeatherData = async (city) => {
     try {
@@ -315,12 +237,17 @@ const WeatherPage = () => {
         throw new Error('Please enter a city name');
       }
 
-      // Make API calls using the weatherApi object
+      // Replace the throw error with:
       const currentWeatherData = await weatherApi.getCurrentWeather(city);
       const hourlyForecastData = await weatherApi.getHourlyForecast(city);  
       const weeklyForecastData = await weatherApi.getWeeklyForecast(city);
 
-      // Update state with API data
+// Then uncomment and use the setState block that's already prepared
+      // For now, throwing an error to show you need to implement the real API calls
+      throw new Error('Please implement your actual weatherApi calls in fetchWeatherData function');
+
+      // Once you have real API data, update the state like this:
+      
       setState(prev => ({
         ...prev,
         firstTime: false,
@@ -339,6 +266,7 @@ const WeatherPage = () => {
         forecast3hrs: hourlyForecastData,
         forecastWeekly: weeklyForecastData
       }));
+      */
       
     } catch (error) {
       setState(prev => ({
@@ -430,7 +358,7 @@ const WeatherPage = () => {
           <p className="text-gray-400 mb-4">Enter a city name to get current weather information and forecasts</p>
           <div className="text-sm text-gray-500">
             <p>Try: London, Paris, Tokyo, New York, Sydney, Mumbai, Cairo</p>
-            <p className="mt-2 text-cyan-400">Demo mode - Using mock data for demonstration</p>
+            <p className="mt-2">Import your weatherApi and implement the API calls in fetchWeatherData function</p>
           </div>
         </div>
       )}

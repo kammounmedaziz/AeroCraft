@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "./weather app.css";
 import weatherApi from "../../utils/weatherApi";
 import SearchBar from "../SearchBar/SearchBar";
 import TodayData from "../TodayData/TodayData";
@@ -23,87 +22,75 @@ class App extends Component {
     this.search = this.search.bind(this);
   }
 
-  //Update today data as sync mode
   updateTodayState = data => {
-    this.setState(
-      {
-        firstTime: false,
-        temp: data.temp,
-        weatherDescription: data.weatherDescription,
-        weatherIcon: data.weatherIcon,
-        country: data.country,
-        timezone: data.timezone,
-        dateTime: data.dateTime,
-        time: data.time,
-        weekday: data.weekday,
-        city: data.city
-      },
-      () => {}
-    );
+    this.setState({
+      firstTime: false,
+      temp: data.temp,
+      weatherDescription: data.weatherDescription,
+      weatherIcon: data.weatherIcon,
+      country: data.country,
+      timezone: data.timezone,
+      dateTime: data.dateTime,
+      time: data.time,
+      weekday: data.weekday,
+      city: data.city
+    });
   };
 
-  //Update weekly data as sync mode
   updateWeeklyState = data => {
-    this.setState(
-      {
-        forecastWeekly: data,
-        forecast3hrs: data.slice(0, 8)
-      },
-      () => {}
-    );
+    this.setState({
+      forecastWeekly: data,
+      forecast3hrs: data.slice(0, 8)
+    });
   };
 
-  //Search the weather based on the city
   search(term) {
-    //Get today data
     weatherApi.getTodayData(term).then(data => this.updateTodayState(data));
-    //Show the forecast for the next 24 hours, each 3 hours
     weatherApi.get3HoursData(term).then(data => this.updateWeeklyState(data));
   }
 
   warningBanner() {
-    if (this.state.firstTime) {
-      return null;
-    }
+    if (this.state.firstTime) return null;
 
     return (
-      <div className="warningBanner">
+      <div className="mt-6 p-4 bg-red-100 border border-red-300 text-red-600 rounded-lg text-center shadow-md">
         We couldn’t find any results. Try checking your spelling.
       </div>
     );
   }
 
-  //Identify if there is data to display
   displayResult() {
-    if ((typeof this.state.city === "undefined") | (this.state.city === "")) {
-      return false;
-    } else {
-      return true;
-    }
+    return this.state.city !== undefined && this.state.city !== "";
   }
 
   render() {
     return (
-      <div className="main">
-        <div className="navbar-main">
-          <h1>Weather</h1>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white px-4 py-6">
+        <div className="max-w-5xl mx-auto">
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
+              Weather App
+            </h1>
+          </header>
+
+          <SearchBar onSearch={this.search} updateTerm={this.updateTerm} />
+
+          {this.displayResult() ? (
+            <TodayData
+              city={this.state.city}
+              country={this.state.country}
+              temp={this.state.temp}
+              time={this.state.time}
+              weekday={this.state.weekday}
+              weatherDescription={this.state.weatherDescription}
+              weatherIcon={this.state.weatherIcon}
+              forecast3hrs={this.state.forecast3hrs}
+              forecastWeekly={this.state.forecastWeekly}
+            />
+          ) : (
+            this.warningBanner()
+          )}
         </div>
-        <SearchBar onSearch={this.search} updateTerm={this.updateTerm} />
-        {this.displayResult() ? (
-          <TodayData
-            city={this.state.city}
-            country={this.state.country}
-            temp={this.state.temp}
-            time={this.state.time}
-            weekday={this.state.weekday}
-            weatherDescription={this.state.weatherDescription}
-            weatherIcon={this.state.weatherIcon}
-            forecast3hrs={this.state.forecast3hrs}
-            forecastWeekly={this.state.forecastWeekly}
-          />
-        ) : (
-          this.warningBanner()
-        )}
       </div>
     );
   }
