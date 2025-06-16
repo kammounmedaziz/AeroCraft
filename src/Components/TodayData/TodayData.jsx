@@ -27,6 +27,7 @@ class TodayData extends React.Component {
               {this.props.temp}
               <span className="text-xl align-top">°C</span>
             </span>
+
           </div>
         </div>
         

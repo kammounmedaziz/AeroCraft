@@ -27,11 +27,12 @@ class GetGraph extends React.Component {
             fillOpacity={1}
             fill="url(#colorUv)"
             label={{
-              fill: "black",
+              fill: "white",
               fontSize: 15,
               position: "top"
             }}
           />
+
         </AreaChart>
       </ResponsiveContainer>
     );
