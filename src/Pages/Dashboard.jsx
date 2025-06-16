@@ -1,4 +1,5 @@
 import AirportPage from './AirportPage';
+import Overview from './Overview';
 import WeatherApp from '../Components/App/weather app';
 import { useState, useEffect, useRef } from 'react';
 import { 
@@ -103,12 +104,7 @@ const Dashboard = () => {
     switch (currentPage) {
       case 'overview':
         return (
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f1636f] to-[#a855f7] mb-4">
-              Dashboard Overview
-            </h2>
-            <p className="text-gray-300 text-lg">Welcome to your dashboard</p>
-          </div>
+          <Overview/>
         );
       case 'analytics':
         return (
