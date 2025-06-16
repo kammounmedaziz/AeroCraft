@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import Footer from "./Components/Footer";
 import Dashboard from "./Pages/Dashboard";
+import WeahterApp from "../src/Components/App/weather app";
 import WeatherPage from './Pages/destination weather/WeatherPage';
 
 
@@ -31,7 +32,7 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
           
           {/* Content with higher z-index */}
           <div className="relative z-10">
-            <Dashboard />
+            <WeahterApp />
             <Footer />
           </div>
         </div>

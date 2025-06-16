@@ -1,364 +1,21 @@
+import AirportPage from './AirportPage';
+import WeatherPage from '../Pages/destination weather/WeatherPage';
 import { useState, useEffect, useRef } from 'react';
 import { 
   Home, 
   BarChart3, 
   Users, 
   Settings, 
-  FileText, 
+
   Calendar,
   Mail,
   Activity,
   ChevronLeft,
   ChevronRight,
   Cloud,
-  Sun,
-  CloudRain,
-  CloudSnow,
-  Thermometer,
-  Droplets,
-  Wind,
-  Eye
+
+  Plane
 } from 'lucide-react';
-
-// Enhanced WeatherPage component with forecasts
-const WeatherPage = () => {
-  const [state, setState] = useState({
-    firstTime: true,
-    city: "",
-    weekday: "",
-    temp: "",
-    weatherDescription: "",
-    weatherIcon: "",
-    country: "",
-    timezone: "",
-    time: "",
-    forecast3hrs: [],
-    forecastWeekly: [],
-    loading: false,
-    error: null,
-    humidity: "",
-    windSpeed: "",
-    visibility: "",
-    feelsLike: ""
-  });
-
-  const [searchInput, setSearchInput] = useState('');
-
-  // Generate mock hourly forecast data
-  const generateHourlyForecast = () => {
-    const hours = [];
-    const now = new Date();
-    const conditions = ['sunny', 'cloudy', 'partly cloudy', 'light rain', 'clear sky'];
-    const icons = ['☀️', '☁️', '⛅', '🌦️', '🌤️'];
-    
-    for (let i = 0; i < 24; i++) {
-      const time = new Date(now.getTime() + i * 60 * 60 * 1000);
-      const conditionIndex = Math.floor(Math.random() * conditions.length);
-      
-      hours.push({
-        time: time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }),
-        temp: Math.round(Math.random() * 15 + 10), // 10-25°C range
-        condition: conditions[conditionIndex],
-        icon: icons[conditionIndex],
-        humidity: Math.round(Math.random() * 40 + 40), // 40-80%
-        windSpeed: Math.round(Math.random() * 20 + 5) // 5-25 km/h
-      });
-    }
-    return hours;
-  };
-
-  // Generate mock weekly forecast data
-  const generateWeeklyForecast = () => {
-    const days = [];
-    const now = new Date();
-    const conditions = ['sunny', 'cloudy', 'partly cloudy', 'light rain', 'clear sky', 'thunderstorm', 'snow'];
-    const icons = ['☀️', '☁️', '⛅', '🌦️', '🌤️', '⛈️', '❄️'];
-    
-    for (let i = 1; i <= 7; i++) {
-      const date = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
-      const conditionIndex = Math.floor(Math.random() * conditions.length);
-      
-      days.push({
-        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        condition: conditions[conditionIndex],
-        icon: icons[conditionIndex],
-        highTemp: Math.round(Math.random() * 15 + 15), // 15-30°C
-        lowTemp: Math.round(Math.random() * 10 + 5), // 5-15°C
-        humidity: Math.round(Math.random() * 40 + 40),
-        windSpeed: Math.round(Math.random() * 25 + 5)
-      });
-    }
-    return days;
-  };
-
-  // Enhanced mock weather data function
-  const fetchWeatherData = async (city) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock data for demo purposes
-      if (city.toLowerCase() === 'invalid' || city.trim().length === 0) {
-        throw new Error('City not found. Please check the spelling and try again.');
-      }
-
-      // Generate mock weather data with forecasts
-      const mockData = {
-        name: city.charAt(0).toUpperCase() + city.slice(1).toLowerCase(),
-        sys: { country: ['US', 'UK', 'CA', 'FR', 'DE', 'JP', 'AU', 'IT', 'ES'][Math.floor(Math.random() * 9)] },
-        main: { 
-          temp: Math.round(Math.random() * 30 + 5),
-          feels_like: Math.round(Math.random() * 30 + 5),
-          humidity: Math.round(Math.random() * 40 + 40)
-        },
-        weather: [{
-          description: ['sunny', 'cloudy', 'partly cloudy', 'light rain', 'clear sky'][Math.floor(Math.random() * 5)],
-          icon: ['01d', '02d', '03d', '10d', '04d'][Math.floor(Math.random() * 5)]
-        }],
-        wind: { speed: Math.round(Math.random() * 20 + 5) },
-        visibility: Math.round(Math.random() * 5 + 5)
-      };
-      
-      setState(prev => ({
-        ...prev,
-        firstTime: false,
-        city: mockData.name,
-        country: mockData.sys.country,
-        temp: mockData.main.temp,
-        feelsLike: mockData.main.feels_like,
-        humidity: mockData.main.humidity,
-        windSpeed: mockData.wind.speed,
-        visibility: mockData.visibility,
-        weatherDescription: mockData.weather[0].description,
-        weatherIcon: mockData.weather[0].icon,
-        loading: false,
-        time: new Date().toLocaleTimeString(),
-        weekday: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
-        forecast3hrs: generateHourlyForecast(),
-        forecastWeekly: generateWeeklyForecast()
-      }));
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: error.message,
-        firstTime: false
-      }));
-    }
-  };
-
-  const handleSearch = () => {
-    if (searchInput.trim()) {
-      fetchWeatherData(searchInput.trim());
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const getWeatherIcon = (condition) => {
-    const iconMap = {
-      'sunny': '☀️',
-      'clear sky': '🌤️',
-      'partly cloudy': '⛅',
-      'cloudy': '☁️',
-      'light rain': '🌦️',
-      'rain': '🌧️',
-      'thunderstorm': '⛈️',
-      'snow': '❄️'
-    };
-    return iconMap[condition] || '🌤️';
-  };
-
-  return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
-          Weather Forecast
-        </h1>
-        <p className="text-gray-400">Get current weather information and forecasts for any city</p>
-      </div>
-
-      {/* Search Input */}
-      <div className="mb-8">
-        <div className="flex gap-4">
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Enter city name..."
-            className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm"
-            disabled={state.loading}
-          />
-          <button
-            onClick={handleSearch}
-            disabled={state.loading || !searchInput.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {state.loading ? 'Searching...' : 'Search'}
-          </button>
-        </div>
-      </div>
-
-      {/* Error Display */}
-      {state.error && (
-        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg backdrop-blur-sm">
-          <p className="text-red-400">⚠️ {state.error}</p>
-          <p className="text-sm text-gray-400 mt-1">
-            Try searching for cities like: London, Paris, Tokyo, New York, Sydney
-          </p>
-        </div>
-      )}
-
-      {/* Weather Display */}
-      {!state.firstTime && !state.error && state.city && (
-        <div className="space-y-6">
-          {/* Current Weather */}
-          <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Weather Info */}
-              <div className="lg:col-span-2 space-y-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
-                    {state.city}, {state.country}
-                  </h2>
-                  <p className="text-gray-400 capitalize">{state.weatherDescription}</p>
-                  <p className="text-sm text-gray-500">{state.weekday} • {state.time}</p>
-                </div>
-                
-                <div className="flex items-center gap-6">
-                  <div className="text-6xl">
-                    {getWeatherIcon(state.weatherDescription)}
-                  </div>
-                  <div>
-                    <span className="text-5xl font-bold text-white">{state.temp}°C</span>
-                    <p className="text-gray-400">Feels like {state.feelsLike}°C</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Weather Details */}
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-white">Details</h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
-                    <Droplets size={16} className="text-cyan-400" />
-                    <div>
-                      <p className="text-gray-400">Humidity</p>
-                      <p className="text-white font-semibold">{state.humidity}%</p>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
-                    <Wind size={16} className="text-green-400" />
-                    <div>
-                      <p className="text-gray-400">Wind</p>
-                      <p className="text-white font-semibold">{state.windSpeed} km/h</p>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
-                    <Eye size={16} className="text-purple-400" />
-                    <div>
-                      <p className="text-gray-400">Visibility</p>
-                      <p className="text-white font-semibold">{state.visibility} km</p>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
-                    <Thermometer size={16} className="text-orange-400" />
-                    <div>
-                      <p className="text-gray-400">Feels Like</p>
-                      <p className="text-white font-semibold">{state.feelsLike}°C</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 24-Hour Forecast */}
-          <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700">
-            <h3 className="text-xl font-semibold text-white mb-4">24-Hour Forecast</h3>
-            <div className="overflow-x-auto">
-              <div className="flex gap-4 pb-2" style={{ minWidth: '1200px' }}>
-                {state.forecast3hrs.slice(0, 24).map((hour, index) => (
-                  <div key={index} className="flex-shrink-0 text-center p-3 bg-gray-800/30 rounded-lg border border-gray-600/50 hover:bg-gray-800/50 transition-all duration-300">
-                    <p className="text-sm text-gray-400 mb-2">{hour.time}</p>
-                    <div className="text-2xl mb-2">{hour.icon}</div>
-                    <p className="text-white font-semibold text-sm">{hour.temp}°C</p>
-                    <p className="text-xs text-gray-500 mt-1 capitalize">{hour.condition}</p>
-                    <div className="mt-2 text-xs text-gray-400">
-                      <p>🌡️ {hour.humidity}%</p>
-                      <p>💨 {hour.windSpeed}km/h</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 7-Day Forecast */}
-          <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700">
-            <h3 className="text-xl font-semibold text-white mb-4">7-Day Forecast</h3>
-            <div className="space-y-3">
-              {state.forecastWeekly.map((day, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-600/50 hover:bg-gray-800/50 transition-all duration-300">
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl">{day.icon}</div>
-                    <div>
-                      <p className="text-white font-semibold">{day.day}</p>
-                      <p className="text-sm text-gray-400">{day.date}</p>
-                    </div>
-                    <p className="text-sm text-gray-300 capitalize ml-4">{day.condition}</p>
-                  </div>
-                  
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <p className="text-white font-semibold">{day.highTemp}°C</p>
-                      <p className="text-sm text-gray-400">{day.lowTemp}°C</p>
-                    </div>
-                    <div className="text-right text-xs text-gray-400">
-                      <p>💧 {day.humidity}%</p>
-                      <p>💨 {day.windSpeed}km/h</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* First Time Display */}
-      {state.firstTime && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🌤️</div>
-          <h3 className="text-xl font-semibold text-white mb-2">Search for Weather</h3>
-          <p className="text-gray-400 mb-4">Enter a city name to get current weather information and forecasts</p>
-          <div className="text-sm text-gray-500">
-            <p>Try: London, Paris, Tokyo, New York, Sydney, Mumbai, Cairo</p>
-            <p className="mt-2">Note: This demo uses mock weather data for demonstration</p>
-          </div>
-        </div>
-      )}
-
-      {/* Loading Display */}
-      {state.loading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-300">Loading weather data...</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 // Animated Background Component
 const AnimatedBackground = () => {
@@ -434,7 +91,7 @@ const Dashboard = () => {
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'weather', label: 'Weather', icon: Cloud },
-    { id: 'reports', label: 'Reports', icon: FileText },
+    { id: 'AirportPage', label: 'Airport', icon: Plane },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'messages', label: 'Messages', icon: Mail },
     { id: 'activity', label: 'Activity', icon: Activity },
@@ -475,14 +132,9 @@ const Dashboard = () => {
         return (
           <WeatherPage />
         );
-      case 'reports':
+      case 'AirportPage':
         return (
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 mb-4">
-              Reports
-            </h2>
-            <p className="text-gray-300 text-lg">Reports Page Component</p>
-          </div>
+          <AirportPage/>
         );
       case 'calendar':
         return (

@@ -1,174 +1,288 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { 
+  Droplets,
+  Wind,
+  Eye,
+  Thermometer
+} from 'lucide-react';
 
-// Mock weather API for demonstration
+// Card component (inline)
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(' ');
+};
+
+const Card = ({ className, children, ...props }) => {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border bg-card text-card-foreground shadow-sm",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Weather API implementation
 const weatherApi = {
-  getTodayData: async (city) => {
+  API_KEY: 'demo', // In a real app, you'd use a real API key
+  BASE_URL: 'https://api.openweathermap.org/data/2.5',
+
+  // Mock data for demonstration
+  getCurrentWeather: async (city) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (!city || city.toLowerCase() === 'invalid') {
-      throw new Error('City not found');
-    }
-    
-    return {
-      temp: Math.round(Math.random() * 30 + 5),
-      weatherDescription: ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'][Math.floor(Math.random() * 4)],
-      weatherIcon: '01d',
-      country: 'US',
-      timezone: 'America/New_York',
-      dateTime: new Date().toISOString(),
-      time: new Date().toLocaleTimeString(),
-      weekday: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
-      city: city
+    // Mock current weather data
+    const mockData = {
+      name: city,
+      sys: { country: 'XX' },
+      main: {
+        temp: Math.round(Math.random() * 30 + 5), // 5-35°C
+        feels_like: Math.round(Math.random() * 30 + 5),
+        humidity: Math.round(Math.random() * 60 + 30) // 30-90%
+      },
+      wind: {
+        speed: Math.round(Math.random() * 20 + 5) // 5-25 km/h
+      },
+      visibility: Math.round(Math.random() * 8000 + 2000), // 2-10km in meters
+      weather: [{
+        description: ['clear sky', 'partly cloudy', 'cloudy', 'light rain', 'sunny'][Math.floor(Math.random() * 5)],
+        icon: '01d'
+      }]
     };
-  },
-  
-  get3HoursData: async (city) => {
-    await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (!city || city.toLowerCase() === 'invalid') {
-      throw new Error('Forecast data not available');
+    return mockData;
+  },
+
+  getHourlyForecast: async (city) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Generate 8 data points for next 24 hours (every 3 hours)
+    const hourlyData = [];
+    for (let i = 0; i < 8; i++) {
+      const baseTemp = Math.round(Math.random() * 25 + 10);
+      hourlyData.push({
+        time: `${(i * 3).toString().padStart(2, '0')}:00`,
+        temp: baseTemp + Math.round(Math.random() * 6 - 3), // ±3°C variation
+        main: { temp: baseTemp }
+      });
     }
     
-    return Array.from({ length: 16 }, (_, i) => ({
-      time: new Date(Date.now() + i * 3 * 60 * 60 * 1000).toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      }),
-      temp: Math.round(Math.random() * 25 + 10),
-      weather: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)],
-      icon: '01d'
-    }));
+    return hourlyData;
+  },
+
+  getWeeklyForecast: async (city) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const conditions = ['Clear', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Sunny'];
+    const icons = ['☀️', '⛅', '☁️', '🌦️', '🌤️'];
+    
+    const weeklyData = [];
+    for (let i = 0; i < 7; i++) {
+      const conditionIndex = Math.floor(Math.random() * conditions.length);
+      const highTemp = Math.round(Math.random() * 20 + 15); // 15-35°C
+      const lowTemp = highTemp - Math.round(Math.random() * 8 + 3); // 3-10°C lower
+      
+      weeklyData.push({
+        weekday: weekdays[i],
+        day: weekdays[i],
+        date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        condition: conditions[conditionIndex],
+        description: conditions[conditionIndex].toLowerCase(),
+        icon: icons[conditionIndex],
+        max: highTemp,
+        min: lowTemp,
+        highTemp: highTemp,
+        lowTemp: lowTemp,
+        humidity: Math.round(Math.random() * 40 + 40), // 40-80%
+        windSpeed: Math.round(Math.random() * 15 + 5) // 5-20 km/h
+      });
+    }
+    
+    return weeklyData;
   }
 };
 
-const SearchBar = ({ onSearch, loading }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+// GetGraph component
+const GetGraph = ({ forecast3hrs }) => {
+  if (!forecast3hrs || forecast3hrs.length === 0) return null;
 
-  const handleSubmit = () => {
-    if (searchTerm.trim()) {
-      onSearch(searchTerm.trim());
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
+  // Transform the data for the chart - take every 3 hours for 24 hours (8 data points)
+  const chartData = forecast3hrs.slice(0, 8).map((item, index) => ({
+    time: item.time || `${index * 3}h`,
+    temp: item.temp || item.main?.temp || 20
+  }));
 
   return (
-    <div className="mb-6">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Enter city name..."
-          className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-          disabled={loading}
-        />
-        <button
-          onClick={handleSubmit}
-          disabled={loading || !searchTerm.trim()}
-          className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-        >
-          {loading ? 'Searching...' : 'Search'}
-        </button>
+    <div className="w-full h-48 mt-4">
+      <div className="text-sm text-gray-400 mb-2">Temperature Trend (Next 24 Hours)</div>
+      <div className="w-full h-full bg-gray-800/30 rounded-lg p-4 flex items-end justify-between gap-2">
+        {chartData.map((point, index) => (
+          <div key={index} className="flex flex-col items-center gap-2 flex-1">
+            <div className="text-xs text-white font-medium">{point.temp}°</div>
+            <div 
+              className="w-full bg-gradient-to-t from-cyan-500 to-blue-400 rounded-t-sm min-h-[20px]"
+              style={{ 
+                height: `${Math.max(20, (point.temp / Math.max(...chartData.map(d => d.temp))) * 80)}px` 
+              }}
+            ></div>
+            <div className="text-xs text-gray-400">{point.time}</div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
+// WeeklyData component
+const WeeklyData = ({ forecastWeekly }) => {
+  if (!forecastWeekly || forecastWeekly.length === 0) return null;
+
+  return (
+    <div className="mt-6">
+      <h3 className="text-xl font-semibold text-white mb-4">7-Day Forecast</h3>
+      <div className="space-y-3">
+        {forecastWeekly.map((forecast, index) => (
+          <div key={index} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-600/50 hover:bg-gray-800/50 transition-all duration-300">
+            <div className="flex items-center gap-4">
+              <div className="text-2xl">{forecast.icon || '🌤️'}</div>
+              <div>
+                <p className="text-white font-semibold">{forecast.weekday || forecast.day}</p>
+                <p className="text-sm text-gray-400">{forecast.date}</p>
+              </div>
+              <p className="text-sm text-gray-300 capitalize ml-4">{forecast.condition || forecast.description}</p>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <p className="text-white font-semibold">{forecast.max || forecast.highTemp}° | {forecast.min || forecast.lowTemp}°</p>
+              </div>
+              {(forecast.humidity || forecast.windSpeed) && (
+                <div className="text-right text-xs text-gray-400">
+                  {forecast.humidity && <p>💧 {forecast.humidity}%</p>}
+                  {forecast.windSpeed && <p>💨 {forecast.windSpeed}km/h</p>}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// TodayData component
 const TodayData = ({ 
   city, 
   country, 
-  temp, 
-  time, 
   weekday, 
+  time, 
   weatherDescription, 
-  weatherIcon, 
-  forecast3hrs, 
+  temp, 
+  weatherIcon,
+  humidity,
+  windSpeed,
+  visibility,
+  feelsLike,
+  forecast3hrs,
   forecastWeekly 
 }) => {
+  const getWeatherIcon = (condition) => {
+    const iconMap = {
+      'sunny': '☀️',
+      'clear sky': '🌤️',
+      'partly cloudy': '⛅',
+      'cloudy': '☁️',
+      'light rain': '🌦️',
+      'rain': '🌧️',
+      'thunderstorm': '⛈️',
+      'snow': '❄️'
+    };
+    return iconMap[condition?.toLowerCase()] || '🌤️';
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Current Weather */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          {city}, {country}
-        </h2>
-        <div className="text-6xl font-bold text-cyan-400 mb-2">
-          {temp}°C
+    <Card className="p-6 bg-gray-900/50 backdrop-blur-lg border-gray-700">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Weather Info */}
+        <div className="lg:col-span-2 space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {city}, {country}
+            </h2>
+            <p className="text-gray-400 capitalize">{weatherDescription}</p>
+            <p className="text-sm text-gray-500">{weekday} • {time}</p>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="text-6xl">
+              {getWeatherIcon(weatherDescription)}
+            </div>
+            <div>
+              <span className="text-5xl font-bold text-white">{temp}°C</span>
+              {feelsLike && <p className="text-gray-400">Feels like {feelsLike}°C</p>}
+            </div>
+          </div>
+
+          {/* Graph Component */}
+          <GetGraph forecast3hrs={forecast3hrs} />
         </div>
-        <p className="text-gray-300 text-lg capitalize mb-1">
-          {weatherDescription}
-        </p>
-        <p className="text-gray-400">
-          {weekday} • {time}
-        </p>
+
+        {/* Weather Details */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-white">Details</h3>
+          <div className="grid grid-cols-1 gap-3 text-sm">
+            {humidity && (
+              <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
+                <Droplets size={16} className="text-cyan-400" />
+                <div>
+                  <p className="text-gray-400">Humidity</p>
+                  <p className="text-white font-semibold">{humidity}%</p>
+                </div>
+              </div>
+            )}
+            {windSpeed && (
+              <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
+                <Wind size={16} className="text-green-400" />
+                <div>
+                  <p className="text-gray-400">Wind</p>
+                  <p className="text-white font-semibold">{windSpeed} km/h</p>
+                </div>
+              </div>
+            )}
+            {visibility && (
+              <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
+                <Eye size={16} className="text-purple-400" />
+                <div>
+                  <p className="text-gray-400">Visibility</p>
+                  <p className="text-white font-semibold">{visibility} km</p>
+                </div>
+              </div>
+            )}
+            {feelsLike && (
+              <div className="p-3 bg-gray-800/50 rounded-lg flex items-center gap-2">
+                <Thermometer size={16} className="text-orange-400" />
+                <div>
+                  <p className="text-gray-400">Feels Like</p>
+                  <p className="text-white font-semibold">{feelsLike}°C</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* 3-Hour Forecast */}
-      {forecast3hrs && forecast3hrs.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3">
-            24-Hour Forecast
-          </h3>
-          <div className="grid grid-cols-4 gap-3 overflow-x-auto">
-            {forecast3hrs.slice(0, 8).map((item, index) => (
-              <div
-                key={index}
-                className="bg-gray-800/30 rounded-lg p-3 text-center min-w-[80px]"
-              >
-                <div className="text-xs text-gray-400 mb-1">
-                  {item.time}
-                </div>
-                <div className="text-lg font-semibold text-white">
-                  {item.temp}°
-                </div>
-                <div className="text-xs text-gray-300 capitalize">
-                  {item.weather}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Weekly Forecast */}
-      {forecastWeekly && forecastWeekly.length > 8 && (
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3">
-            Extended Forecast
-          </h3>
-          <div className="space-y-2">
-            {forecastWeekly.slice(8, 16).map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between bg-gray-800/30 rounded-lg p-3"
-              >
-                <div className="text-white font-medium">
-                  Day {index + 2}
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-300 capitalize text-sm">
-                    {item.weather}
-                  </span>
-                  <span className="text-white font-semibold">
-                    {item.temp}°C
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+      <WeeklyData forecastWeekly={forecastWeekly} />
+    </Card>
   );
 };
 
+// Main WeatherPage component
 const WeatherPage = () => {
   const [state, setState] = useState({
     firstTime: true,
@@ -183,177 +297,153 @@ const WeatherPage = () => {
     forecast3hrs: [],
     forecastWeekly: [],
     loading: false,
-    error: null
+    error: null,
+    humidity: "",
+    windSpeed: "",
+    visibility: "",
+    feelsLike: ""
   });
 
-  // Update today data
-  const updateTodayState = (data) => {
-    setState(prevState => ({
-      ...prevState,
-      firstTime: false,
-      temp: data.temp,
-      weatherDescription: data.weatherDescription,
-      weatherIcon: data.weatherIcon,
-      country: data.country,
-      timezone: data.timezone,
-      dateTime: data.dateTime,
-      time: data.time,
-      weekday: data.weekday,
-      city: data.city,
-      error: null
-    }));
-  };
+  const [searchInput, setSearchInput] = useState('');
 
-  // Update weekly data
-  const updateWeeklyState = (data) => {
-    setState(prevState => ({
-      ...prevState,
-      forecastWeekly: data,
-      forecast3hrs: data.slice(0, 8)
-    }));
-  };
-
-  // Set error state
-  const setError = (error) => {
-    setState(prevState => ({
-      ...prevState,
-      error: error.message || 'An error occurred',
-      loading: false,
-      firstTime: false
-    }));
-  };
-
-  // Set loading state
-  const setLoading = (loading) => {
-    setState(prevState => ({
-      ...prevState,
-      loading,
-      error: loading ? null : prevState.error
-    }));
-  };
-
-  // Search the weather based on the city
-  const search = async (term) => {
-    setLoading(true);
-    
+  // Real weather API call function
+  const fetchWeatherData = async (city) => {
     try {
-      // Get today data
-      const todayData = await weatherApi.getTodayData(term);
-      updateTodayState(todayData);
+      setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // Show the forecast for the next 24 hours, each 3 hours
-      const forecastData = await weatherApi.get3HoursData(term);
-      updateWeeklyState(forecastData);
+      if (!city || city.trim().length === 0) {
+        throw new Error('Please enter a city name');
+      }
+
+      // Make API calls using the weatherApi object
+      const currentWeatherData = await weatherApi.getCurrentWeather(city);
+      const hourlyForecastData = await weatherApi.getHourlyForecast(city);  
+      const weeklyForecastData = await weatherApi.getWeeklyForecast(city);
+
+      // Update state with API data
+      setState(prev => ({
+        ...prev,
+        firstTime: false,
+        city: currentWeatherData.name,
+        country: currentWeatherData.sys.country,
+        temp: Math.round(currentWeatherData.main.temp),
+        feelsLike: Math.round(currentWeatherData.main.feels_like),
+        humidity: currentWeatherData.main.humidity,
+        windSpeed: Math.round(currentWeatherData.wind.speed),
+        visibility: currentWeatherData.visibility ? Math.round(currentWeatherData.visibility / 1000) : null,
+        weatherDescription: currentWeatherData.weather[0].description,
+        weatherIcon: currentWeatherData.weather[0].icon,
+        loading: false,
+        time: new Date().toLocaleTimeString(),
+        weekday: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+        forecast3hrs: hourlyForecastData,
+        forecastWeekly: weeklyForecastData
+      }));
       
-      setLoading(false);
     } catch (error) {
-      setError(error);
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: error.message,
+        firstTime: false
+      }));
     }
   };
 
-  // Error banner component
-  const errorBanner = () => {
-    if (!state.error) return null;
-
-    return (
-      <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-        <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          <span className="text-red-400 font-medium">
-            {state.error}
-          </span>
-        </div>
-        <p className="text-red-300 text-sm mt-1">
-          Please check your spelling and try again.
-        </p>
-      </div>
-    );
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      fetchWeatherData(searchInput.trim());
+    }
   };
 
-  // Loading component
-  const loadingIndicator = () => {
-    if (!state.loading) return null;
-
-    return (
-      <div className="flex items-center justify-center p-12">
-        <div className="flex items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
-          <span className="text-gray-300">Loading weather data...</span>
-        </div>
-      </div>
-    );
-  };
-
-  // Welcome message for first-time users
-  const welcomeMessage = () => {
-    if (!state.firstTime || state.loading || state.error) return null;
-
-    return (
-      <div className="text-center p-12">
-        <div className="text-6xl mb-4">🌤️</div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Welcome to Weather Forecast
-        </h2>
-        <p className="text-gray-400">
-          Enter a city name above to get started with current weather and forecasts.
-        </p>
-        <div className="mt-6 text-sm text-gray-500">
-          <p>Try searching for cities like: New York, London, Tokyo, or Paris</p>
-          <p className="mt-2">Type "invalid" to see error handling in action</p>
-        </div>
-      </div>
-    );
-  };
-
-  // Identify if there is data to display
-  const displayResult = () => {
-    return !state.firstTime && !state.error && !state.loading && state.city;
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 p-4">
-      <div className="w-full max-w-4xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
-            Weather Forecast
-          </h1>
-          <p className="text-gray-400">
-            Get current weather and forecasts for any city worldwide
-          </p>
-        </div>
-        
-        <SearchBar onSearch={search} loading={state.loading} />
-        
-        {errorBanner()}
-        
-        {state.loading && loadingIndicator()}
-        
-        {displayResult() && (
-          <div className="p-6 bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-gray-700 shadow-2xl">
-            <TodayData
-              city={state.city}
-              country={state.country}
-              temp={state.temp}
-              time={state.time}
-              weekday={state.weekday}
-              weatherDescription={state.weatherDescription}
-              weatherIcon={state.weatherIcon}
-              forecast3hrs={state.forecast3hrs}
-              forecastWeekly={state.forecastWeekly}
-            />
-          </div>
-        )}
-        
-        {welcomeMessage()}
-        
-        {/* API Note */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Note: This demo uses mock weather data for demonstration purposes.</p>
-          <p>Replace with your OpenWeatherMap API key for live weather data.</p>
+    <div className="w-full max-w-7xl mx-auto p-6 min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+          Weather Forecast
+        </h1>
+        <p className="text-gray-400">Get current weather information and forecasts for any city</p>
+      </div>
+
+      {/* Search Input */}
+      <div className="mb-8">
+        <div className="flex gap-4">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter city name..."
+            className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm"
+            disabled={state.loading}
+          />
+          <button
+            onClick={handleSearch}
+            disabled={state.loading || !searchInput.trim()}
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {state.loading ? 'Searching...' : 'Search'}
+          </button>
         </div>
       </div>
+
+      {/* Error Display */}
+      {state.error && (
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg backdrop-blur-sm">
+          <p className="text-red-400">⚠️ {state.error}</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Try searching for cities like: London, Paris, Tokyo, New York, Sydney
+          </p>
+        </div>
+      )}
+
+      {/* Weather Display using TodayData component */}
+      {!state.firstTime && !state.error && state.city && (
+        <TodayData
+          city={state.city}
+          country={state.country}
+          weekday={state.weekday}
+          time={state.time}
+          weatherDescription={state.weatherDescription}
+          temp={state.temp}
+          weatherIcon={state.weatherIcon}
+          humidity={state.humidity}
+          windSpeed={state.windSpeed}
+          visibility={state.visibility}
+          feelsLike={state.feelsLike}
+          forecast3hrs={state.forecast3hrs}
+          forecastWeekly={state.forecastWeekly}
+        />
+      )}
+
+      {/* First Time Display */}
+      {state.firstTime && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🌤️</div>
+          <h3 className="text-xl font-semibold text-white mb-2">Search for Weather</h3>
+          <p className="text-gray-400 mb-4">Enter a city name to get current weather information and forecasts</p>
+          <div className="text-sm text-gray-500">
+            <p>Try: London, Paris, Tokyo, New York, Sydney, Mumbai, Cairo</p>
+            <p className="mt-2 text-cyan-400">Demo mode - Using mock data for demonstration</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Display */}
+      {state.loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-gray-300">Loading weather data...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
