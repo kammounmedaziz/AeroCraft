@@ -7,7 +7,7 @@ import {
   BarChart3, 
   Users, 
   Settings, 
-
+  PlaneLanding,
   Calendar,
   Mail,
   Activity,
@@ -89,8 +89,8 @@ const Dashboard = () => {
   // Define your menu items
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: Home },
+    { id: 'AirportData', label: 'AirportData', icon: PlaneLanding },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'users', label: 'Users', icon: Users },
     { id: 'weather', label: 'Weather', icon: Cloud },
     { id: 'AirportPage', label: 'Airport', icon: Plane },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -99,7 +99,6 @@ const Dashboard = () => {
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  // Render the selected page component
   const renderPage = () => {
     switch (currentPage) {
       case 'overview':

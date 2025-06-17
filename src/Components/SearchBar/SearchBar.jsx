@@ -24,18 +24,18 @@ class SearchBar extends React.Component {
       <div className="flex justify-center my-6">
         <form
           onSubmit={this.search}
-          className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-md"
+          className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-2xl shadow-md border border-white/20"
         >
           <input
             type="text"
-            placeholder="Search a city..."
-            className="px-4 py-2 rounded-xl text-white bg-slate-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 w-64"
+            placeholder="Search a city or airport..."
+            className="px-4 py-2 rounded-xl text-white bg-transparent placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#a855f7] w-64 transition-all duration-300"
             value={this.state.term}
             onChange={this.handleTermChange}
           />
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition-shadow duration-300 shadow-md hover:shadow-blue-500/50"
+            className="bg-gradient-to-r from-[#f1636f] to-[#a855f7] hover:from-[#f1636f] hover:to-[#a855f7] text-white px-5 py-2 rounded-xl transition-all duration-300 shadow-md hover:shadow-[#a855f7]/50 hover:scale-[1.02]"
           >
             Search
           </button>

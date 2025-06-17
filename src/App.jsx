@@ -33,7 +33,6 @@ const LandingPage = ({ showWelcome, setShowWelcome }) => {
           {/* Content with higher z-index */}
           <div className="relative z-10">
             <Dashboard />
-            <Footer />
           </div>
         </div>
       )}

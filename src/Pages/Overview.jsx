@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Cloud, CloudRain, Sun, Wind, Navigation, Clock, Gauge, Mountain, Sparkles } from 'lucide-react';
+import SearchBar from '../Components/SearchBar/SearchBar'; // Import the SearchBar component
 
 const AnimatedBackground = () => {
   const blobRefs = useRef([])
@@ -76,6 +77,23 @@ const FlightOverviewPage = () => {
       visibility: 8.5
     }
   });
+  
+  // State for search functionality
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredFlights, setFilteredFlights] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  // Sample flight data for demonstration
+  const sampleFlights = [
+    { id: 1, code: 'LAX', name: 'Los Angeles International Airport' },
+    { id: 2, code: 'JFK', name: 'John F. Kennedy International Airport' },
+    { id: 3, code: 'LHR', name: 'London Heathrow Airport' },
+    { id: 4, code: 'CDG', name: 'Charles de Gaulle Airport' },
+    { id: 5, code: 'DXB', name: 'Dubai International Airport' },
+    { id: 6, code: 'SIN', name: 'Singapore Changi Airport' },
+    { id: 7, code: 'HND', name: 'Haneda Airport' },
+    { id: 8, code: 'FRA', name: 'Frankfurt Airport' },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,6 +118,34 @@ const FlightOverviewPage = () => {
       clearInterval(dataTimer);
     };
   }, []);
+
+  // Handle search functionality
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    if (term.trim() === '') {
+      setFilteredFlights([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    const filtered = sampleFlights.filter(flight => 
+      flight.code.toLowerCase().includes(term.toLowerCase()) || 
+      flight.name.toLowerCase().includes(term.toLowerCase())
+    );
+    
+    setFilteredFlights(filtered);
+    setShowSearchResults(true);
+  };
+
+  // Handle flight selection
+  const handleFlightSelect = (flight) => {
+    setFlightData({
+      ...flightData,
+      destination: `${flight.code} - ${flight.name.split(' ')[0]}`
+    });
+    setShowSearchResults(false);
+    setSearchTerm('');
+  };
 
   const getWeatherIcon = (condition) => {
     switch (condition) {
@@ -137,12 +183,40 @@ const FlightOverviewPage = () => {
                 OVERVIEW
               </span>
             </h1>
-            <p className="text-gray-300 text-lg md:text-xl flex items-center justify-center gap-2">
+            <p className="text-gray-300 text-lg md:text-xl flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-5 h-5 text-[#f1636f]" />
               Live Flight Data Dashboard
               <Sparkles className="w-5 h-5 text-[#f1636f]" />
             </p>
-            <p className="text-gray-400 mt-2">
+            
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto relative">
+              <SearchBar onSearch={handleSearch} />
+              
+              {/* Search Results Dropdown */}
+              {showSearchResults && filteredFlights.length > 0 && (
+                <div className="absolute left-0 right-0 mt-1 z-20">
+                  <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl shadow-lg overflow-hidden">
+                    {filteredFlights.map(flight => (
+                      <div 
+                        key={flight.id}
+                        className="p-4 hover:bg-white/20 cursor-pointer transition-colors duration-200 flex items-center gap-3"
+                        onClick={() => handleFlightSelect(flight)}
+                      >
+                        <div className="bg-gradient-to-r from-red-400 to-red-600 w-10 h-10 rounded-lg flex items-center justify-center">
+                          <span className="font-bold text-white">{flight.code}</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-white">{flight.name}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-gray-400 mt-4">
               Current Time: {currentTime.toLocaleTimeString()}
             </p>
           </div>
