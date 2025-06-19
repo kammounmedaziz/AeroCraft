@@ -1,3 +1,4 @@
+import AirportWeatherData from './Airport Weather Data';
 import AirportPage from './AirportPage';
 import Overview from './Overview';
 import WeatherApp from '../Components/App/weather app';
@@ -89,9 +90,9 @@ const Dashboard = () => {
   // Define your menu items
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: Home },
-    { id: 'AirportData', label: 'AirportData', icon: PlaneLanding },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'weather', label: 'Weather', icon: Cloud },
+    { id: 'AirportWeatherData', label: 'Airport Weather Data', icon: PlaneLanding },
+    { id: 'weather', label: 'Destination Weather', icon: Cloud },
+    { id: 'Statistics', label: 'Statistics', icon: BarChart3 },
     { id: 'AirportPage', label: 'Airport', icon: Plane },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'messages', label: 'Messages', icon: Mail },
@@ -104,6 +105,10 @@ const Dashboard = () => {
       case 'overview':
         return (
           <Overview/>
+        );
+      case 'AirportWeatherData':
+        return (
+          <AirportWeatherData/>
         );
       case 'analytics':
         return (
